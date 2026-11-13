@@ -9,7 +9,7 @@ set_site_information(
     description="Chemistry Helper Website",
     sources = "",
     planning = [],
-    links = []
+    links = ["https://github.com/klwynn/Chemistry-Helper"]
 )
 hide_debug_information()
 
