@@ -1,4 +1,4 @@
-
+from bakery import assert_equal
 from dataclasses import dataclass
 from drafter import *
 
@@ -43,8 +43,6 @@ class State:
     feedback: str
 
 
-# HOME PAGE
-
 @route
 def index(state: State) -> Page:
     '''
@@ -70,7 +68,6 @@ def index(state: State) -> Page:
     ])
 
 
-# STOICHIOMETRY PAGE
 
 @route
 def stoichiometry_page(state: State) -> Page:
@@ -95,7 +92,6 @@ def stoichiometry_page(state: State) -> Page:
     ])
 
 
-# LIMITING REACTANT PAGE
 
 @route
 def limiting_page(state: State) -> Page:
@@ -185,8 +181,6 @@ def calculate_limiting(state: State, formula_1: str,
     return limiting_page(state)
 
 
-# PERCENT YIELD PAGE
-
 @route
 def percent_yield_page(state: State) -> Page:
     '''
@@ -241,8 +235,6 @@ def calculate_yield(state: State, actual: float,
     return percent_yield_page(state)
 
 
-# ENERGY PAGE
-
 @route
 def energy_page(state: State) -> Page:
     '''
@@ -296,7 +288,6 @@ def check_energy(state: State, delta_h: float) -> Page:
     return energy_page(state)
 
 
-# PRACTICE PAGE
 
 @route
 def practice_page(state: State) -> Page:
@@ -356,8 +347,6 @@ def check_answer(state: State, user_answer: str) -> Page:
     return practice_page(state)
 
 
-# RESULTS PAGE
-
 @route
 def results_page(state: State) -> Page:
     '''
@@ -383,8 +372,6 @@ def results_page(state: State) -> Page:
     ])
 
 
-# PRACTICE QUESTIONS
-
 questions_list = [
     PracticeQuestion(
         question="What is the molar mass of H2O?",
@@ -395,8 +382,6 @@ questions_list = [
 ]
 
 
-# STARTING STATE
-
 initial_state = State(
     page="Home",
     topic="Home",
@@ -404,6 +389,67 @@ initial_state = State(
     score=0,
     feedback=""
 )
+
+#Unit Tests
+test_state = State("Home", "Home", questions_list, 0, "")
+page = index(test_state)
+assert_equal(page.state.page, "Home")
+
+test_state = State("Home", "Home", questions_list, 0, "")
+page = stoichiometry_page(test_state)
+assert_equal(page.state.topic, "Limiting Reactants")
+
+test_state = State("Home", "Home", questions_list, 0, "")
+page = limiting_page(test_state)
+assert_equal(page.state.page, "Limiting Reactants")
+
+test_state = State("Home", "Home", questions_list, 0, "")
+page = calculate_limiting(test_state, "H2", 4.032, "O2", 32.0)
+assert_equal(test_state.feedback,
+             "Limiting Reactant: O2 | Excess Reactant: H2 | Excess Remaining: 2.02 g")
+
+test_state = State("Home", "Home", questions_list, 0, "")
+page = calculate_limiting(test_state, "ABC", 5.0, "O2", 10.0)
+assert_equal(test_state.feedback, "Please enter valid chemical formulas.")
+
+test_state = State("Home", "Home", questions_list, 0, "")
+page = percent_yield_page(test_state)
+assert_equal(page.state.page, "Percent Yield")
+
+test_state = State("Home", "Home", questions_list, 0, "")
+page = calculate_yield(test_state, 8.0, 10.0)
+assert_equal(test_state.feedback, "Percent Yield: 80.0%")
+
+test_state = State("Home", "Home", questions_list, 0, "")
+page = energy_page(test_state)
+assert_equal(page.state.topic, "Enthalpy")
+
+test_state = State("Home", "Home", questions_list, 0, "")
+page = check_energy(test_state, 25.0)
+assert_equal(test_state.feedback,
+             "This is an endothermic reaction.")
+
+test_state = State("Home", "Home", questions_list, 0, "")
+page = check_energy(test_state, -25.0)
+assert_equal(test_state.feedback,
+             "This is an exothermic reaction.")
+
+test_state = State("Home", "Home", questions_list, 0, "")
+page = practice_page(test_state)
+assert_equal(page.state.page, "Practice")
+
+test_state = State("Home", "Home", questions_list, 0, "")
+page = check_answer(test_state, "18.015")
+assert_equal(test_state.score, 1)
+
+test_state = State("Home", "Home", questions_list, 0, "")
+page = check_answer(test_state, "20")
+assert_equal(test_state.score, 0)
+
+test_state = State("Home", "Home", questions_list, 1, "")
+page = results_page(test_state)
+assert_equal(page.content[0], Text("Practice Results"))
+
 
 start_server(initial_state)
 
